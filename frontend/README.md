@@ -6,7 +6,7 @@
 - Jest ustawiony ESLint i TypeScript. Przed commitem rutynowo uruchamiamy `npm run lint` i `npm run build`, aby wychwycić błędy przed wypchnięciem zmian.
 - Projekt korzysta z testów jednostkowych i integracyjnych opartych na Vitest oraz React Testing Library. Testy uruchamiamy poleceniem `npm run test`. W razie potrzeby możemy skorzystać z `npm run test:watch`, aby uruchamiać je ponownie podczas pracy nad kodem.
 - **Pliki demonstracyjne:** w kodzie mogą znajdować się tymczasowe komponenty, funkcje lub przykłady służące do nauki i testowania rozwiązań, oznaczone odpowiednim komentarzem, np. `USUŃ MNIE, GDY PRZESTANĘ BYĆ PRZYDATNY JAKO DEMO`. Nie należy traktować ich jako docelowej części aplikacji. Przed usunięciem sprawdzamy, czy nadal są potrzebne, czy korzystają z nich testy oraz czy nie zależą od nich inne komponenty.
-- Proszę nie wprowadzać pochopnych zmian w plikach poza folderami `src`, `pages` i `public`. Jeżeli zadanie wymaga zmiany plików konfiguracyjnych, workflow lub innych elementów poza tym zakresem, najpierw konsultujemy to na Discordzie.
+- Nie wprowadzamy pochopnych zmian w plikach poza folderami `src` i `public`. Jeżeli zadanie wymaga zmiany plików konfiguracyjnych, workflow lub innych elementów poza tym zakresem, najpierw konsultujemy to na Discordzie.
 - Style tworzymy za pomocą Tailwind CSS, aby zachować jednolity sposób stylowania w całej aplikacji.
 
 ## 2. Kiedy zabieramy się za zadanie
@@ -15,8 +15,8 @@
 
 1. Tworzymy nową gałąź na podstawie aktualnej gałęzi **`dev-branch`**.
 2. Otwieramy na GitHubie nowy Draft PR i łączymy go z odpowiednim Issue ([instrukcja GitHub](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue#manually-linking-a-pull-request-or-branch-to-an-issue-using-the-issue-sidebar)).
-3. Draft PR służy do sygnalizowania postępu prac i nie oznacza, że kod jest gotowy na review.
-4. Checkoutujemy nowo utworzoną gałąź na własnym komputerze.
+Draft PR służy do sygnalizowania postępu prac i nie oznacza, że kod jest gotowy na review.
+3. Checkoutujemy nowo utworzoną gałąź na własnym komputerze.
 
 ### 2. Organizacja kodu i routing
 
@@ -182,3 +182,6 @@ Gdy praca nad feature'em jest zakończona:
 - `src/styles/` zawiera wspólne style, w tym import Tailwind CSS.
 - Pliki specyficzne dla jednej funkcjonalności — w tym komponenty, hooki, konteksty, logikę stanu i powiązane testy — przechowujemy w katalogu odpowiedniego feature'a, o ile nie ma uzasadnienia, by je współdzielić.
 - `public/` przechowuje zasoby statyczne udostępniane bez przetwarzania przez Vite.
+- `src/app/App.tsx` zawiera główny komponent aplikacji oraz konfigurację routingu SPA za pomocą React Routera. Nowe ekrany podłączamy tutaj do odpowiednich ścieżek, zamiast tworzyć osobne punkty wejścia dla każdej trasy.
+- `src/app/App.test.tsx` zawiera testy integracyjne głównego komponentu aplikacji. To dobre miejsce na sprawdzanie współpracy routingu i najważniejszych elementów aplikacji, np. tego, czy nawigacja między ekranami działa poprawnie i czy współdzielony stan zachowuje się zgodnie z oczekiwaniami.
+- `src/test/setup.ts` zawiera wspólną konfigurację środowiska testowego Vitest. Umieszczamy tu konfigurację i czynności przygotowawcze potrzebne wielu testom, np. import rozszerzeń asercji z `@testing-library/jest-dom/vitest` oraz automatyczne sprzątanie po testach za pomocą `cleanup()`. Dzięki temu nie trzeba powtarzać tej samej konfiguracji w każdym pliku testowym. Jeśli zmieniamy wspólne zachowanie środowiska testowego, sprawdzamy wpływ tej zmiany na cały zestaw testów - najlepiej, odpalając przed i po zmianie środowiska `npm run test`.
