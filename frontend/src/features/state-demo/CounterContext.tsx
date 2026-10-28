@@ -1,20 +1,8 @@
 
-import {
-  createContext,
-  useContext,
-  useState,
-  type ReactNode,
-} from 'react'
+import { useState, type ReactNode } from 'react'
+import { CounterContext } from './counter-context'
 
-type CounterContextValue = {
-  count: number
-  increment: () => void
-  reset: () => void
-}
-
-const CounterContext = createContext<CounterContextValue | undefined>(
-  undefined,
-)
+// USUŃ MNIE, GDY PRZESTANĘ BYĆ PRZYDATNY JAKO DEMO
 
 export function CounterProvider({ children }: { children: ReactNode }) {
   const [count, setCount] = useState(0)
@@ -32,14 +20,4 @@ export function CounterProvider({ children }: { children: ReactNode }) {
       {children}
     </CounterContext.Provider>
   )
-}
-
-export function useCounter() {
-  const context = useContext(CounterContext)
-
-  if (context === undefined) {
-    throw new Error('useCounter must be used within CounterProvider')
-  }
-
-  return context
 }

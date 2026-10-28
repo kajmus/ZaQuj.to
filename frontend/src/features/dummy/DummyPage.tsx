@@ -12,7 +12,7 @@ export default function DummyPage() {
                 <h1 className="text-3xl font-bold">Strona dodatkowa</h1>
 
                 <p className="text-slate-600">
-                    Nie wygląda, ale jest! I znaczy, że SPA działa!
+                    Nie wygląda, ale jest! I znaczy, że SPA działa! Usuń mnie, gdy przyjdzie czas na tworzenie strony od zera.
                 </p>
 
                 <Link to="/"

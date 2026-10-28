@@ -1,7 +1,11 @@
 
 import { useState } from 'react'
-import { useCounter } from './CounterContext'
-import { getCookie, setCookie } from '../../lib/cookies'
+import { useCounter } from './use-counter'
+import {
+  getCookie,
+  setCookie,
+  deleteCookie as removeCookie,
+} from '../../lib/cookies'
 
 const COOKIE_NAME = 'state_demo_note'
 
@@ -18,14 +22,13 @@ export default function StateDemo() {
     setCookieInput('')
   }
 
-  function deleteCookie() {
-    setCookie(COOKIE_NAME, '')
-    setCookieValue('')
-  }
-
+function deleteCookie() {
+  removeCookie(COOKIE_NAME)
+  setCookieValue('')
+}
   return (
     <section className="mt-8 space-y-6 rounded-xl border p-6">
-      <h2 className="text-xl font-bold">Test zarządzania stanem</h2>
+      <h2 className="text-xl font-bold">Test zarządzania stanem! Usuń mnie, gdy przestanę być przydatny jako demo.</h2>
 
       <div className="space-y-2">
         <h3 className="font-semibold">React Context</h3>

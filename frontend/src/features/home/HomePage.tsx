@@ -12,7 +12,7 @@ export default function HomePage() {
                 <h1 className="text-3xl font-bold">Strona główna</h1>
 
                 <p className="text-slate-600">
-                    Nie wygląda, ale jest!
+                    Nie wygląda, ale jest! Zmień mnie, gdy przyjdzie czas na tworzenie strony od zera.
                 </p>
 
                 <Link to="/dummy"
