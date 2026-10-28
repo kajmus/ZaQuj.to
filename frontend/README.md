@@ -8,7 +8,7 @@
 
 ## 2. Kiedy zabieramy się za zadanie
 
-1. Tworzymy nową gałąź na podstawie aktualnej gałęzi **`dev-branch`**, a następnie otwieramy powiązany z danym Issue na GitHubie Draft PR. [Instrukcja łączenia PR-a z Issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue#manually-linking-a-pull-request-or-branch-to-an-issue-using-the-issue-sidebar). Draft PR służy do sygnalizowania postępu prac i nie oznacza, że kod jest gotowy na review.
+1. Tworzymy nową gałąź na podstawie aktualnej gałęzi **`dev-branch`**, a następnie otwieramy na GitHubie nowy Draft PR i łączymy go z Issue ([Instrukcja](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue#manually-linking-a-pull-request-or-branch-to-an-issue-using-the-issue-sidebar)). Draft PR służy do sygnalizowania postępu prac i nie oznacza, że kod jest gotowy na review.
 2. Checkoutujemy nowo utworzoną gałąź na własnym komputerze.
 3. Gdy chcemy dodać nowy feature, tworzymy folder na jego kod w `src/features/<nazwa-feature'a>/`.
 4. Gdy nowy feature **wymaga** własnego entrypointa (tj. oddzielnej strony w aplikacji), tworzymy odpowiednie pliki:
