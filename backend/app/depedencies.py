@@ -1,0 +1,1 @@
+#skrypty na zaleznosci do endpoitow

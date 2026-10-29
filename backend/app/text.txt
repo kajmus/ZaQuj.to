@@ -1,0 +1,17 @@
+\api
+Folder na endpointy
+
+\core
+Folder na zmienne globalne oraz ustawienia np. (pydantic-settings, .env), JWT, hashowanie haseł, engine, sesja, Base
+
+\crud
+Folder na skrypty na bazach danych
+
+\models
+Folder na modele SQL Alchemy
+
+\schemas
+Folder na schematy Pyndantic
+
+\services
+Folder na dodatkowe skryptky lub logike poszczegolnych funkcji
