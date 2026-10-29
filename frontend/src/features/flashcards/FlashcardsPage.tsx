@@ -17,8 +17,6 @@ const sampleCards: FlashcardData[] = [
     id: '3',
     frontText: 'Bardzo długie pytanie numer trzy, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi.',
     backText: 'Bardzo długa odpowiedź numer trzy, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi.',
-    // Najwięcej na standardowym ekranie mieści się około 300 znaków, na telefonie około 100. 
-    // TODO: Dorobić skalowanie tekstu lub wielkości fiszki
 },
 ]
 
