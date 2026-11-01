@@ -1,42 +1,66 @@
-// PRZYKŁADOWY TEST
-// Zmień mnie, gdy przestanę być przydatny jako demo!
 
 import { beforeEach, describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from './App'
 
-describe('Aplikacja i współdzielony stan', () => {
+describe('Aplikacja i nawigacja', () => {
   beforeEach(() => {
     window.history.pushState({}, '', '/')
+    sessionStorage.clear()
   })
 
-  it('zachowuje licznik podczas nawigacji między stronami', async () => {
+  it('wyświetla stronę główną niezalogowanemu użytkownikowi', () => {
+    render(<App />)
+
+    expect(
+      screen.getByRole('heading', { name: 'Co dziś powtarzamy?' }),
+    ).toBeInTheDocument()
+
+    expect(
+      screen.getByRole('button', { name: /zaloguj się/i }),
+    ).toBeInTheDocument()
+  })
+
+  it('umożliwia zalogowanie i przejście do fiszek', async () => {
     const user = userEvent.setup()
 
     render(<App />)
 
-    // Zwiększamy licznik na stronie głównej.
+    // Logujemy użytkownika.
     await user.click(
-      screen.getByRole('button', { name: 'Zwiększ' }),
+      screen.getByRole('button', { name: /zaloguj się/i }),
     )
 
+    expect(sessionStorage.getItem('app_session')).toBe('active')
+
+    // Sprawdzamy dostępność funkcji nauki.
+    const flashcardsLink = screen.getByRole('link', {
+      name: /fiszki/i,
+    })
+
+    expect(flashcardsLink).toBeInTheDocument()
+
+    // Przechodzimy do fiszek.
+    await user.click(flashcardsLink)
+
+    // Sprawdzamy, czy wyświetliła się strona fiszek.
     expect(
-      screen.getByText(/Licznik współdzielony: 1/),
+      screen.getByRole('heading', { name: /fiszki/i }),
+    ).toBeInTheDocument()
+  })
+
+  it('wyświetla funkcje nauki po odświeżeniu aplikacji z aktywną sesją', () => {
+    sessionStorage.setItem('app_session', 'active')
+
+    render(<App />)
+
+    expect(
+      screen.getByRole('link', { name: /fiszki/i }),
     ).toBeInTheDocument()
 
-    // Przechodzimy na drugą stronę bez przeładowania aplikacji.
-    await user.click(
-      screen.getByRole('link', { name: 'Do dummy' }),
-    )
-
     expect(
-      screen.getByRole('heading', { name: 'Strona dodatkowa' }),
-    ).toBeInTheDocument()
-
-    // Licznik powinien nadal mieć wartość 1.
-    expect(
-      screen.getByText(/Licznik współdzielony: 1/),
-    ).toBeInTheDocument()
+      screen.getByRole('button', { name: /quizy/i }),
+    ).toBeDisabled()
   })
 })
