@@ -21,6 +21,12 @@ export default function HomePage() {
                     Do dummy
                 </Link>
 
+                <Link to="/flashcards"
+                    className="ml-3 inline-block rounded-lg bg-teal-700 px-4 py-2 font-medium text-white hover:bg-teal-800"
+                >
+                    Otwórz fiszki
+                </Link>
+
       <StateDemo />
             </div>
         </main>
