@@ -17,7 +17,7 @@ class Category(Base):
         nullable=False
     )
 
-    flashcards: Mapped[list["Flashcard"]] = relationship(
-        "Flashcard",
+    topics: Mapped[list["Topic"]] = relationship(
+        "Topic",
         back_populates="category"
     )

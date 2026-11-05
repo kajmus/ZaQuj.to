@@ -23,12 +23,7 @@ class User(Base):
         nullable=False
     )
 
-    flashcard_results: Mapped[list["FlashcardResult"]] = relationship(
-        "FlashcardResult",
-        back_populates="user"
-    )
-
-    question_results: Mapped[list["QuestionResult"]] = relationship(
-        "QuestionResult",
+    tests: Mapped[list["Test"]] = relationship(
+        "Test",
         back_populates="user"
     )

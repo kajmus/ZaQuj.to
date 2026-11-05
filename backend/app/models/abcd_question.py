@@ -17,9 +17,9 @@ class ABCDQuestion(Base):
         nullable=False
     )
 
-    id_fiszka: Mapped[int] = mapped_column(
+    id_temat: Mapped[int] = mapped_column(
         Integer,
-        ForeignKey("Pytanie_Fiszka.id_fiszka"),
+        ForeignKey("Temat.id_temat"),
         nullable=False
     )
 
@@ -43,12 +43,12 @@ class ABCDQuestion(Base):
         nullable=False
     )
 
-    flashcard: Mapped["Flashcard"] = relationship(
-        "Flashcard",
+    topic: Mapped["Topic"] = relationship(
+        "Topic",
         back_populates="questions"
     )
 
-    results: Mapped[list["QuestionResult"]] = relationship(
-        "QuestionResult",
+    results: Mapped[list["Result"]] = relationship(
+        "Result",
         back_populates="question"
     )
