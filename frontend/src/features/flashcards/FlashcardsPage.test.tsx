@@ -19,6 +19,7 @@ describe('FlashcardsPage', () => {
       </MemoryRouter>,
     )
 
+    expect(screen.getByRole('link', { name: 'Strona główna' })).toBeInTheDocument()
     expect(screen.getByText('Pierwsze pytanie')).toBeInTheDocument()
     expect(screen.getByText('Karta 1 z 2')).toBeInTheDocument()
 
@@ -34,7 +35,7 @@ describe('FlashcardsPage', () => {
     expect(screen.getByText('Pierwsze pytanie')).toBeInTheDocument()
   })
 
-  it('zlicza i zastępuje ocenę karty oraz zostaje na ostatniej karcie', async () => {
+  it('zlicza i zastępuje ocenę karty, a po ostatniej pokazuje podsumowanie', async () => {
     const user = userEvent.setup()
 
     render(
@@ -64,7 +65,8 @@ describe('FlashcardsPage', () => {
     await user.click(screen.getByRole('button', { name: 'Sprawdź' }))
     await user.click(screen.getByRole('button', { name: 'Źle' }))
 
-    expect(screen.getByText('Drugie pytanie')).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Koniec fiszek' })).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Powrót do strony głównej' })).toHaveAttribute('href', '/')
     expect(screen.getByText('Poprawne: 1')).toBeInTheDocument()
     expect(screen.getByText('Niepoprawne: 1')).toBeInTheDocument()
   })

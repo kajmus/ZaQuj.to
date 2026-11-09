@@ -31,6 +31,7 @@ export default function FlashcardsPage({
 }: FlashcardsPageProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [ratings, setRatings] = useState<Record<string, FlashcardRating>>({})
+  const [isComplete, setIsComplete] = useState(false)
   const selectedIndex = Math.min(currentIndex, Math.max(cards.length - 1, 0))
   const currentCard = cards[selectedIndex]
   const correctCount = Object.values(ratings).filter((rating) => rating === 'correct').length
@@ -51,18 +52,25 @@ export default function FlashcardsPage({
       ...currentRatings,
       [currentCard.id]: rating,
     }))
-    showNextCard()
+
+    if (selectedIndex === cards.length - 1) {
+      setIsComplete(true)
+    } else {
+      showNextCard()
+    }
   }
 
   return (
     <main className="min-h-screen bg-slate-50 px-5 py-8 text-slate-900 sm:px-8">
       <div className="mx-auto max-w-2xl">
-        <Link
-          to="/"
-          className="text-sm font-medium text-indigo-700 underline-offset-4 hover:underline"
-        >
-          Strona główna
-        </Link>
+        {!isComplete && (
+          <Link
+            to="/"
+            className="text-sm font-medium text-indigo-700 underline-offset-4 hover:underline"
+          >
+            Strona główna
+          </Link>
+        )}
 
         <header className="mb-8 mt-10">
           <p className="text-sm font-semibold uppercase tracking-wide text-indigo-700">
@@ -71,7 +79,24 @@ export default function FlashcardsPage({
           <h1 className="mt-2 text-3xl font-bold">Fiszki</h1>
         </header>
 
-        {currentCard ? (
+        {isComplete ? (
+          <section className="flex flex-col items-center">
+            <Link
+              to="/"
+              className="inline-flex min-h-20 w-full max-w-md items-center justify-center rounded-lg bg-indigo-700 px-6 py-4 text-center text-lg font-semibold text-white transition-colors hover:bg-indigo-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-700"
+            >
+              Powrót do strony głównej
+            </Link>
+            <div className="mt-6 grid w-full grid-cols-2 gap-3 text-center" aria-live="polite">
+              <p className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-medium text-rose-800">
+                Niepoprawne: {incorrectCount}
+              </p>
+              <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-800">
+                Poprawne: {correctCount}
+              </p>
+            </div>
+          </section>
+        ) : currentCard ? (
           <>
             <p className="mb-3 text-right text-sm font-medium text-slate-600" aria-live="polite">
               Karta {selectedIndex + 1} z {cards.length}
