@@ -7,13 +7,21 @@ from typing import Sequence
 
 flashcard_router = APIRouter(prefix="", tags=["flashcards"])
 
+#Switch to using get_flashcards_by_topic later
+@flashcard_router.get("/",  response_model = FlashcardListResponse)
+async def get_all_flashcards(db: AsyncSession = DBSession):
+    questions: Sequence[ABCDQuestion] = await get_all_questions(db)
+    flashcards: FlashcardListResponse = map_abcd_questions_seq_to_flashcard(questions)
+    # in empty list is send instead of 404 if there are no flashcards assigned to the topic
+    return flashcards
+ 
 @flashcard_router.get("/topic/{topic_id}",  response_model = FlashcardListResponse)
 async def get_flashcards_by_topic(topic_id: int, db: AsyncSession = DBSession):
     questions: Sequence[ABCDQuestion] = await get_questions_by_topic(db, topic_id)
     flashcards: FlashcardListResponse = map_abcd_questions_seq_to_flashcard(questions)
     # in empty list is send instead of 404 if there are no flashcards assigned to the topic
     return flashcards
- 
+
 @flashcard_router.get("/{flashcard_id}", response_model = FlashcardResponse)
 async def get_flashcard(flashcard_id: int, 
                         db: AsyncSession = DBSession):

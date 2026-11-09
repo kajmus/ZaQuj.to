@@ -14,6 +14,12 @@ async def get_question_by_id(
     db: AsyncSession, question_id: int) -> Optional[ABCDQuestion]:
     return await db.get(ABCDQuestion, question_id)
 
+"""Może być zbyt wolna dla dużej ilości pytań. W takim wypadku trzeba albo używać get_questions_by_topic
+albo nałożyć jakiś limit"""
+async def get_all_questions(db: AsyncSession) -> Sequence[ABCDQuestion]:
+    result = await db.execute(select(ABCDQuestion))
+    return result.scalars().all()
+
 async def create_question(
     db: AsyncSession,
     text: str,
