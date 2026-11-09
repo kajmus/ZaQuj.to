@@ -3,13 +3,14 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi import FastAPI
 
+#can be swapped with v2, v3 versions without affecting the others
 from app.api.v1.endpoints.questions import question_router
 from app.api.v1.endpoints.users import user_router
 from app.api.v1.endpoints.flashcards import flashcard_router
 
-# All json data requests should be under /ap1/(version_nubmer) prefix to separate them from page requests
+# All json data requests should be under /ap1 prefix to separate them from page requests
 api_router = APIRouter(
-    prefix="/api/v1",
+    prefix="/api",
     tags=["api"],
     dependencies=[],
     responses={404: {"description": "Not SD"}},

@@ -1,9 +1,8 @@
-from typing import Sequence
+from typing import Sequence, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from app.models.abcd_question import ABCDQuestion
-
 
 async def get_questions_by_topic(db: AsyncSession, topic_id: int) -> Sequence[ABCDQuestion]:
     result = await db.execute(
@@ -11,6 +10,9 @@ async def get_questions_by_topic(db: AsyncSession, topic_id: int) -> Sequence[AB
     )
     return result.scalars().all()
 
+async def get_question_by_id(
+    db: AsyncSession, question_id: int) -> Optional[ABCDQuestion]:
+    return await db.get(ABCDQuestion, question_id)
 
 async def create_question(
     db: AsyncSession,
