@@ -47,9 +47,10 @@ export interface FlashcardData {
 interface FlashcardProps {
   frontText: string
   backText: string
+  onRate: (rating: 'incorrect' | 'correct') => void
 }
 
-export default function Flashcard({ frontText, backText }: FlashcardProps) {
+export default function Flashcard({ frontText, backText, onRate }: FlashcardProps) {
   const [isFlipped, setIsFlipped] = useState(false)
 
   function flipCard() {
@@ -96,13 +97,32 @@ export default function Flashcard({ frontText, backText }: FlashcardProps) {
         </button>
       </div>
 
-      <button
-        type="button"
-        onClick={flipCard}
-        className="w-full rounded-lg bg-indigo-700 px-5 py-3 font-semibold text-white transition-colors hover:bg-indigo-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-700"
-      >
-        {isFlipped ? 'Wróć do pytania' : 'Sprawdź'}
-      </button>
+      {isFlipped ? (
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            onClick={() => onRate('incorrect')}
+            className="rounded-lg bg-rose-700 px-5 py-3 font-semibold text-white transition-colors hover:bg-rose-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700"
+          >
+            Źle
+          </button>
+          <button
+            type="button"
+            onClick={() => onRate('correct')}
+            className="rounded-lg bg-emerald-700 px-5 py-3 font-semibold text-white transition-colors hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
+          >
+            Dobrze
+          </button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={flipCard}
+          className="w-full rounded-lg bg-indigo-700 px-5 py-3 font-semibold text-white transition-colors hover:bg-indigo-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-700"
+        >
+          Sprawdź
+        </button>
+      )}
     </div>
   )
 }

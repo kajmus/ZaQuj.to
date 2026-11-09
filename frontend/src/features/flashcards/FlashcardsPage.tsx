@@ -24,12 +24,17 @@ interface FlashcardsPageProps {
   cards?: FlashcardData[]
 }
 
+type FlashcardRating = 'incorrect' | 'correct'
+
 export default function FlashcardsPage({
   cards = sampleCards,
 }: FlashcardsPageProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [ratings, setRatings] = useState<Record<string, FlashcardRating>>({})
   const selectedIndex = Math.min(currentIndex, Math.max(cards.length - 1, 0))
   const currentCard = cards[selectedIndex]
+  const correctCount = Object.values(ratings).filter((rating) => rating === 'correct').length
+  const incorrectCount = Object.values(ratings).filter((rating) => rating === 'incorrect').length
 
   function showPreviousCard() {
     setCurrentIndex((index) => Math.max(index - 1, 0))
@@ -37,6 +42,16 @@ export default function FlashcardsPage({
 
   function showNextCard() {
     setCurrentIndex((index) => Math.min(index + 1, cards.length - 1))
+  }
+
+  function rateCurrentCard(rating: FlashcardRating) {
+    if (!currentCard) return
+
+    setRatings((currentRatings) => ({
+      ...currentRatings,
+      [currentCard.id]: rating,
+    }))
+    showNextCard()
   }
 
   return (
@@ -66,7 +81,17 @@ export default function FlashcardsPage({
               key={currentCard.id}
               frontText={currentCard.frontText}
               backText={currentCard.backText}
+              onRate={rateCurrentCard}
             />
+
+            <div className="mt-4 grid grid-cols-2 gap-3 text-center" aria-live="polite">
+              <p className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-medium text-rose-800">
+                Niepoprawne: {incorrectCount}
+              </p>
+              <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-800">
+                Poprawne: {correctCount}
+              </p>
+            </div>
 
             <nav aria-label="Nawigacja fiszek" className="mt-6 flex justify-between">
               <button

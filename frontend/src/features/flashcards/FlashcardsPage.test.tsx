@@ -34,6 +34,41 @@ describe('FlashcardsPage', () => {
     expect(screen.getByText('Pierwsze pytanie')).toBeInTheDocument()
   })
 
+  it('zlicza i zastępuje ocenę karty oraz zostaje na ostatniej karcie', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter>
+        <FlashcardsPage cards={cards} />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByText('Poprawne: 0')).toBeInTheDocument()
+    expect(screen.getByText('Niepoprawne: 0')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Sprawdź' }))
+    await user.click(screen.getByRole('button', { name: 'Źle' }))
+
+    expect(screen.getByText('Drugie pytanie')).toBeInTheDocument()
+    expect(screen.getByText('Niepoprawne: 1')).toBeInTheDocument()
+    expect(screen.getByText('Poprawne: 0')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Poprzednia' }))
+    await user.click(screen.getByRole('button', { name: 'Sprawdź' }))
+    await user.click(screen.getByRole('button', { name: 'Dobrze' }))
+
+    expect(screen.getByText('Drugie pytanie')).toBeInTheDocument()
+    expect(screen.getByText('Poprawne: 1')).toBeInTheDocument()
+    expect(screen.getByText('Niepoprawne: 0')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Sprawdź' }))
+    await user.click(screen.getByRole('button', { name: 'Źle' }))
+
+    expect(screen.getByText('Drugie pytanie')).toBeInTheDocument()
+    expect(screen.getByText('Poprawne: 1')).toBeInTheDocument()
+    expect(screen.getByText('Niepoprawne: 1')).toBeInTheDocument()
+  })
+
   it('pokazuje komunikat, gdy zestaw jest pusty', () => {
     render(
       <MemoryRouter>

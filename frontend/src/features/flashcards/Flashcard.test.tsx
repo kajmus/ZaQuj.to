@@ -1,14 +1,21 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Flashcard from './Flashcard'
 import { fitTextToContainer } from './fit-text'
 
 describe('Flashcard', () => {
-  it('pokazuje odpowiedź po kliknięciu karty i wraca do pytania', async () => {
+  it('pokazuje odpowiedź i umożliwia ocenienie jej jako poprawnej', async () => {
     const user = userEvent.setup()
+    const onRate = vi.fn()
 
-    render(<Flashcard frontText="Pytanie testowe" backText="Odpowiedź testowa" />)
+    render(
+      <Flashcard
+        frontText="Pytanie testowe"
+        backText="Odpowiedź testowa"
+        onRate={onRate}
+      />,
+    )
 
     expect(screen.getByText('Pytanie testowe')).toBeInTheDocument()
 
@@ -16,16 +23,23 @@ describe('Flashcard', () => {
 
     expect(screen.getByText('Odpowiedź testowa')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Pokaż pytanie' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Źle' })).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'Wróć do pytania' }))
+    await user.click(screen.getByRole('button', { name: 'Dobrze' }))
 
-    expect(screen.getByText('Pytanie testowe')).toBeInTheDocument()
+    expect(onRate).toHaveBeenCalledWith('correct')
   })
 
   it('obraca kartę przyciskiem Sprawdź', async () => {
     const user = userEvent.setup()
 
-    render(<Flashcard frontText="Pytanie testowe" backText="Odpowiedź testowa" />)
+    render(
+      <Flashcard
+        frontText="Pytanie testowe"
+        backText="Odpowiedź testowa"
+        onRate={vi.fn()}
+      />,
+    )
 
     await user.click(screen.getByRole('button', { name: 'Sprawdź' }))
 
