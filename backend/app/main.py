@@ -4,6 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 app.include_router(api_router, prefix="/api")
 
+tymaczasowa_tabela_sesji_ram = {} # specjalnie po polsku bo bedzie do wyjebania, kamilu nie denerwuj sie
+
+
 @app.get("/")
 async def root():
     return {"message": "Główna strona"}

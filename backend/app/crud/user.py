@@ -19,7 +19,14 @@ async def get_users(db: AsyncSession, skip: int = 0, limit: int = 100) -> Sequen
     result = await db.execute(select(User).offset(skip).limit(limit))
     return result.scalars().all()
 
-
+async def delete_user(db: AsyncSession, user_id: int) -> bool:
+    user = await db.get(User,user_id) 
+    if not user:
+        return False
+    await db.delete(user)
+    await db.commit()
+    return True
+    
 async def create_user(db: AsyncSession, login: str, password_hash: str) -> User:
     new_user = User(login=login, password=password_hash)
     db.add(new_user)

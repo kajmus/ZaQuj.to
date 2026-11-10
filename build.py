@@ -85,7 +85,7 @@ def install_dependencies():
 
     print("Installing frontend dependencies...")
 
-    run_command(["npm", "install"], FRONTEND)
+    run_command(["npm.cmd", "install"], FRONTEND)
 
     print("First setup completed.")
 
