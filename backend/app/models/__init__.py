@@ -5,3 +5,4 @@ from app.models.topic import Topic
 from app.models.abcd_question import ABCDQuestion
 from app.models.test import Test
 from app.models.result import Result
+from app.models.user_session import UserSession
