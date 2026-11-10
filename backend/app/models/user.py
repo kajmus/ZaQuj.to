@@ -27,3 +27,8 @@ class User(Base):
         "Test",
         back_populates="user"
     )
+
+    sessions: Mapped[list["UserSession"]] = relationship(
+        "UserSession",
+        back_populates="user"
+    )
