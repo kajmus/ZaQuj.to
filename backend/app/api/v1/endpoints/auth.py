@@ -1,5 +1,9 @@
-from fastapi import APIRouter
-from app.services import our_hash
+from fastapi import APIRouter , HTTPException, status
+from app.core.security import our_hash
+from app.schemas import UserRegister 
+from app.crud.user import * 
+from app.crud import *
+from app.dependencies import *
 
 auth_router = APIRouter(prefix="",tags =["auth"])
 
@@ -14,7 +18,25 @@ def get_auth():
 
 
 @auth_router.post("/login")
-async def post_auth_login():
+async def post_auth_login(user_reg: UserRegister, db: AsyncSession = DBSession ):
+    if not user_reg:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Wrong request")
+    
+    user_data_db =await get_user_by_login(user_reg.name, db)
+
+    if not user_data_db:
+        raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="User login doesnt exist")
+    
+    hashed_request_password = our_hash(user_reg.password)
+
+    if not hashed_request_password == user_data_db.password:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="Password doesn't match")
+
+    result = await create_user_session(user_data_db.id_user , DBSession)
     
     return
 

@@ -11,8 +11,9 @@ from app.api.v1.endpoints.auth import auth_router
 
 
 # All json data requests should be under /ap1 prefix to separate them from page requests
+# It is declard in main.py, please dont change it
 api_router = APIRouter(
-    prefix="/api",
+    prefix="",
     tags=["api"],
     dependencies=[],
     responses={404: {"description": "Not SD"}},

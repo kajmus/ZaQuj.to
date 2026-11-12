@@ -2,6 +2,8 @@ from fastapi import FastAPI, APIRouter, HTTPException
 from app.api.v1.api import api_router
 from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
+
+
 app.include_router(api_router, prefix="/api")
 
 @app.get("/")
@@ -19,6 +21,8 @@ app.add_middleware(
 def health():
     return {"status": "ok"}
 
-@app.api_route("/{path:path}", methods=["GET", "POST","PUT","PATCH","DELETE"])
+
+
+@app.api_route("/{path:path}", methods=["GET", "POST","PUT","PATCH","DELETE"], operation_id="custom_catch_all_route")
 async def catch_all(path : str):
     raise HTTPException(status_code=404, detail=f"Route {path} not found")

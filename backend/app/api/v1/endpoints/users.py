@@ -3,13 +3,13 @@ from app.crud.user import *
 from app.dependencies import *
 from sqlalchemy.exc import IntegrityError
 from app.schemas import UserRegister
-from app.services import our_hash
+from app.core.security import our_hash
 
 user_router = APIRouter(prefix="", tags=["users"])
 
 
 
-@user_router.get("")
+@user_router.get("/")
 async def get_users_(db: AsyncSession = DBSession):
     result = await get_users(db,skip=0,limit=100)
     return result
