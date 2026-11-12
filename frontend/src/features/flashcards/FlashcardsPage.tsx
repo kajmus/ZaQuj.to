@@ -1,24 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Flashcard, { type FlashcardData } from './Flashcard'
-
-const sampleCards: FlashcardData[] = [
-  {
-    id: '1',
-    frontText: 'Pytanie numer jeden',
-    backText: 'Odpowiedź numer jeden',
-  },
-  {
-    id: '2',
-    frontText: 'Pytanie numer dwa',
-    backText: 'Odpowiedź numer dwa',
-  },
-  {
-    id: '3',
-    frontText: 'Bardzo długie pytanie numer trzy, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi.',
-    backText: 'Bardzo długa odpowiedź numer trzy, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi.',
-},
-]
+import { fetchFlashcards } from './flashcards-api'
 
 interface FlashcardsPageProps {
   cards?: FlashcardData[]
@@ -26,23 +9,46 @@ interface FlashcardsPageProps {
 
 type FlashcardRating = 'incorrect' | 'correct'
 
-export default function FlashcardsPage({
-  cards = sampleCards,
-}: FlashcardsPageProps) {
+export default function FlashcardsPage({ cards }: FlashcardsPageProps) {
+  const [loadedCards, setLoadedCards] = useState<FlashcardData[]>([])
+  const [loadState, setLoadState] = useState<'loading' | 'error' | 'success'>(
+    cards === undefined ? 'loading' : 'success',
+  )
+  const [retryCount, setRetryCount] = useState(0)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [ratings, setRatings] = useState<Record<string, FlashcardRating>>({})
   const [isComplete, setIsComplete] = useState(false)
-  const selectedIndex = Math.min(currentIndex, Math.max(cards.length - 1, 0))
-  const currentCard = cards[selectedIndex]
+  const activeCards = cards ?? loadedCards
+  const isLoading = cards === undefined && loadState === 'loading'
+  const loadError = cards === undefined && loadState === 'error'
+  const selectedIndex = Math.min(currentIndex, Math.max(activeCards.length - 1, 0))
+  const currentCard = activeCards[selectedIndex]
   const correctCount = Object.values(ratings).filter((rating) => rating === 'correct').length
   const incorrectCount = Object.values(ratings).filter((rating) => rating === 'incorrect').length
+
+  useEffect(() => {
+    if (cards !== undefined) return
+
+    const controller = new AbortController()
+
+    fetchFlashcards(undefined, controller.signal)
+      .then((result) => {
+        setLoadedCards(result)
+        setLoadState('success')
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setLoadState('error')
+      })
+
+    return () => controller.abort()
+  }, [cards, retryCount])
 
   function showPreviousCard() {
     setCurrentIndex((index) => Math.max(index - 1, 0))
   }
 
   function showNextCard() {
-    setCurrentIndex((index) => Math.min(index + 1, cards.length - 1))
+    setCurrentIndex((index) => Math.min(index + 1, activeCards.length - 1))
   }
 
   function rateCurrentCard(rating: FlashcardRating) {
@@ -53,7 +59,7 @@ export default function FlashcardsPage({
       [currentCard.id]: rating,
     }))
 
-    if (selectedIndex === cards.length - 1) {
+    if (selectedIndex === activeCards.length - 1) {
       setIsComplete(true)
     } else {
       showNextCard()
@@ -79,7 +85,25 @@ export default function FlashcardsPage({
           <h1 className="mt-2 text-3xl font-bold">Fiszki</h1>
         </header>
 
-        {isComplete ? (
+        {isLoading ? (
+          <p role="status" className="rounded-xl border border-slate-200 bg-white p-8 text-slate-600">
+            Ładowanie fiszek...
+          </p>
+        ) : loadError ? (
+          <section role="alert" className="rounded-xl border border-rose-200 bg-rose-50 p-8 text-rose-800">
+            <p>Nie udało się pobrać fiszek.</p>
+            <button
+              type="button"
+              onClick={() => {
+                setLoadState('loading')
+                setRetryCount((count) => count + 1)
+              }}
+              className="mt-4 rounded-lg border border-rose-300 px-4 py-2 font-medium hover:bg-rose-100"
+            >
+              Spróbuj ponownie
+            </button>
+          </section>
+        ) : isComplete ? (
           <section className="flex flex-col items-center">
             <Link
               to="/"
@@ -99,7 +123,7 @@ export default function FlashcardsPage({
         ) : currentCard ? (
           <>
             <p className="mb-3 text-right text-sm font-medium text-slate-600" aria-live="polite">
-              Karta {selectedIndex + 1} z {cards.length}
+              Karta {selectedIndex + 1} z {activeCards.length}
             </p>
 
             <Flashcard
@@ -130,7 +154,7 @@ export default function FlashcardsPage({
               <button
                 type="button"
                 onClick={showNextCard}
-                disabled={selectedIndex === cards.length - 1}
+                disabled={selectedIndex === activeCards.length - 1}
                 className="rounded-lg border border-slate-300 px-4 py-2 font-medium text-slate-700 hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Następna
