@@ -4,3 +4,7 @@ from pydantic import BaseModel
 class UserRegister(BaseModel):
     name: str 
     password: str
+
+
+class SessionVerifySchema(BaseModel):
+    session_id: int

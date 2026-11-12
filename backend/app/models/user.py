@@ -28,7 +28,7 @@ class User(Base):
         back_populates="user"
     )
 
-    sessions: Mapped[list["UserSession"]] = relationship(
-        "UserSession",
-        back_populates="user"
-    )
+    session: Mapped["UserSession"] = relationship(
+        "UserSession", 
+        back_populates="user", 
+            uselist=False)
