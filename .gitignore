@@ -65,3 +65,10 @@ db/password.txt
 
 # But avoid deleting frontend/src/lib/
 !/frontend/src/lib
+
+# Visual Studio
+.vs/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
