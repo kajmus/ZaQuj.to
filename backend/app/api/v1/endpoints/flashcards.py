@@ -30,7 +30,7 @@ async def get_flashcard(flashcard_id: int,
     if not flashcard: 
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, 
-            detail="Flashcard not found"
+            detail=f"Flashcard {flashcard_id} not found"
         )
     return flashcard
 
