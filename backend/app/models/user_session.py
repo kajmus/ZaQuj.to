@@ -11,7 +11,7 @@ class UserSession(Base):
 
     id_session: Mapped[int] = mapped_column(Integer, primary_key=True)
     id_user: Mapped[int] = mapped_column(
-        Integer, ForeignKey("User.id_user"), nullable=False
+        Integer, ForeignKey("User.id_user"), nullable=False,unique = True
     )
     started_at: Mapped[datetime] = mapped_column(
         DateTime,
@@ -19,4 +19,4 @@ class UserSession(Base):
         nullable=False,
     )
 
-    user: Mapped["User"] = relationship("User", back_populates="sessions")
+    user: Mapped["User"] = relationship("User", back_populates="session")
