@@ -1,13 +1,12 @@
 from typing import Optional
-from pydantic import BaseModel
-from app.models.abcd_question import ABCDQuestion
+from pydantic import AliasChoices, BaseModel, Field
 
 class FlashcardBase(BaseModel):
     front_text: str
     back_text: str
 
 class FlashcardResponse(FlashcardBase):
-    id: int
+    id: int = Field(validation_alias=AliasChoices("id", "id_pytanie"))
 
     class Config:
         from_attributes = True
