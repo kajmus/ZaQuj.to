@@ -1,10 +1,14 @@
 
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from './App'
 
 describe('Aplikacja i nawigacja', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
   beforeEach(() => {
     window.history.pushState({}, '', '/')
     sessionStorage.clear()
@@ -48,6 +52,28 @@ describe('Aplikacja i nawigacja', () => {
     expect(
       screen.getByRole('heading', { name: /fiszki/i }),
     ).toBeInTheDocument()
+  })
+
+  it('otwiera menu kategorii z kafelka na stronie głównej', async () => {
+    const user = userEvent.setup()
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({
+      items: [{ id: 1, name: 'Matematyka' }],
+      total: 1,
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    })))
+    sessionStorage.setItem('app_session', 'active')
+
+    render(<App />)
+
+    await user.click(screen.getByRole('link', { name: /kategorie/i }))
+
+    expect(await screen.findByRole('heading', { name: 'Kategorie' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Matematyka' })).toHaveAttribute(
+      'href',
+      '/categories/1/topics',
+    )
   })
 
   it('wyświetla funkcje nauki po odświeżeniu aplikacji z aktywną sesją', () => {
