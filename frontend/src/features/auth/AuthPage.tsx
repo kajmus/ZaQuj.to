@@ -40,7 +40,9 @@ export default function AuthPage() {
     <main className="min-h-screen bg-slate-50 px-5 py-8 text-slate-900 sm:px-8">
       <div className="mx-auto max-w-3xl">
         <header className="mb-10">
-          <Link to="/" className="text-sm font-semibold uppercase tracking-widest text-indigo-700">ZaQuj.to</Link>
+          <p className="text-sm font-semibold uppercase tracking-widest text-indigo-700">
+            <Link to="/">ZaQuj.to</Link>
+          </p>
           <h1 className="mt-2 text-3xl font-bold">Zaloguj się/Załóż konto</h1>
           <p className="mt-3 text-slate-600">Zaloguj się lub załóż konto, aby uzyskać dostęp do narzędzi nauki.</p>
         </header>
