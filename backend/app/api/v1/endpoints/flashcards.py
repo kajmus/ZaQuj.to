@@ -1,31 +1,33 @@
 from fastapi import APIRouter, HTTPException, status
-from app.schemas.flashcards import *
+from app.schemas.flashcards import FlashcardListResponse, FlashcardResponse
 from app.services.flashcard_service import *
 from app.dependencies import DBSession
-from app.crud.abcd_question import *
-from typing import Sequence
+from app.crud import abcd_question as db
+from app.models.abcd_question import ABCDQuestion
+from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Optional, Sequence
 
 flashcard_router = APIRouter(prefix="", tags=["flashcards"])
 
 #Switch to using get_flashcards_by_topic later
 @flashcard_router.get("/",  response_model = FlashcardListResponse)
-async def get_all_flashcards(db: AsyncSession = DBSession):
-    questions: Sequence[ABCDQuestion] = await get_all_questions(db)
+async def get_all_flashcards(session: AsyncSession = DBSession):
+    questions: Sequence[ABCDQuestion] = await db.get_all_questions(session)
     flashcards: FlashcardListResponse = map_abcd_questions_seq_to_flashcard(questions)
     # in empty list is send instead of 404 if there are no flashcards assigned to the topic
     return flashcards
  
 @flashcard_router.get("/topic/{topic_id}",  response_model = FlashcardListResponse)
-async def get_flashcards_by_topic(topic_id: int, db: AsyncSession = DBSession):
-    questions: Sequence[ABCDQuestion] = await get_questions_by_topic(db, topic_id)
+async def get_flashcards_by_topic(topic_id: int, session: AsyncSession = DBSession):
+    questions: Sequence[ABCDQuestion] = await db.get_questions_by_topic(session, topic_id)
     flashcards: FlashcardListResponse = map_abcd_questions_seq_to_flashcard(questions)
     # in empty list is send instead of 404 if there are no flashcards assigned to the topic
     return flashcards
 
 @flashcard_router.get("/{flashcard_id}", response_model = FlashcardResponse)
 async def get_flashcard(flashcard_id: int, 
-                        db: AsyncSession = DBSession):
-    question: Optional[ABCDQuestion] = await get_question_by_id(db, flashcard_id) #flashcard_id the same as question_id
+                        session: AsyncSession = DBSession):
+    question: Optional[ABCDQuestion] = await db.get_question_by_id(session, flashcard_id) #flashcard_id the same as question_id
     flashcard: FlashcardResponse = map_abcd_question_to_flashcard(question)
     if not flashcard: 
         raise HTTPException(
