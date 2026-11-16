@@ -49,7 +49,7 @@ describe('menu kategorii i tematów', () => {
     expect(fetchMock).toHaveBeenCalledWith('/api/categories/')
   })
 
-  it('pobiera tematy i nazwę wybranej kategorii, ale nie aktywuje tematów', async () => {
+  it('pobiera tematy, linkuje wybrane tematy i pozostawia „Wszystkie” nieaktywne', async () => {
     const fetchMock = vi.fn((input: RequestInfo | URL) => {
       const url = String(input)
       if (url.endsWith('/topics/category/3')) {
@@ -65,7 +65,10 @@ describe('menu kategorii i tematów', () => {
     renderAt('/categories/3/topics')
 
     expect(await screen.findByRole('heading', { name: 'Biologia' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Komórka' })).toBeDisabled()
+    expect(screen.getByRole('link', { name: 'Komórka' })).toHaveAttribute(
+      'href',
+      '/topics/12',
+    )
     expect(screen.getByRole('button', { name: 'Wszystkie' })).toBeDisabled()
     expect(fetchMock).toHaveBeenCalledWith('/api/topics/category/3')
     expect(fetchMock).toHaveBeenCalledWith('/api/categories/3')
@@ -81,7 +84,10 @@ describe('menu kategorii i tematów', () => {
     renderAt('/categories/all/topics')
 
     expect(await screen.findByRole('heading', { name: 'Wszystkie' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Algebra' })).toBeDisabled()
+    expect(screen.getByRole('link', { name: 'Algebra' })).toHaveAttribute(
+      'href',
+      '/topics/21',
+    )
     expect(screen.getByRole('button', { name: 'Wszystkie' })).toBeDisabled()
     expect(fetchMock).toHaveBeenCalledOnce()
     expect(fetchMock).toHaveBeenCalledWith('/api/topics/')

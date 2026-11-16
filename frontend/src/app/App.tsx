@@ -5,6 +5,7 @@ import DummyPage from '../features/dummy/DummyPage'
 import FlashcardsPage from '../features/flashcards/FlashcardsPage'
 import CategoriesPage from '../features/categories/CategoriesPage'
 import TopicsPage from '../features/categories/TopicsPage'
+import TopicPage from '../features/categories/TopicPage'
 import { CounterProvider } from '../features/state-demo/CounterContext'
 
 export default function App() {
@@ -16,7 +17,9 @@ export default function App() {
         <Route path="/dummy" element={<DummyPage />} />
         <Route path="/categories" element={<CategoriesPage />} />
         <Route path="/categories/:categoryId/topics" element={<TopicsPage />} />
+        <Route path="/topics/:topicId" element={<TopicPage />} />
         <Route path="/flashcards" element={<FlashcardsPage />} />
+        <Route path="/flashcards/topic/:topicId" element={<FlashcardsPage />} />
       </Routes>
     </BrowserRouter>
     </CounterProvider>

@@ -34,6 +34,10 @@ export function fetchCategory(categoryId: number): Promise<Category> {
   return getJson<Category>(`/categories/${categoryId}`)
 }
 
+export function fetchTopic(topicId: number): Promise<Topic> {
+  return getJson<Topic>(`/topics/${topicId}`)
+}
+
 export async function fetchTopics(categoryId: number | 'all'): Promise<Topic[]> {
   const path = categoryId === 'all'
     ? '/topics/'

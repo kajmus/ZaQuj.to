@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import FlashcardsPage from './FlashcardsPage'
 import { fetchFlashcards } from './flashcards-api'
 
@@ -106,7 +106,32 @@ describe('FlashcardsPage', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Ładowanie fiszek...')
     expect(await screen.findByText('Pytanie z API')).toBeInTheDocument()
     expect(fetchMock).toHaveBeenCalledWith(
-      'http://127.0.0.1:8000/api/flashcards/',
+      '/api/flashcards/',
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
+    )
+  })
+
+  it('pobiera i wyświetla fiszki tylko dla tematu z trasy', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        items: [{ id: 12, front_text: 'Pytanie z tematu', back_text: 'Odpowiedź z tematu' }],
+        total: 1,
+      }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    render(
+      <MemoryRouter initialEntries={['/flashcards/topic/12']}>
+        <Routes>
+          <Route path="/flashcards/topic/:topicId" element={<FlashcardsPage />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByText('Pytanie z tematu')).toBeInTheDocument()
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/flashcards/topic/12',
       expect.objectContaining({ signal: expect.any(AbortSignal) }),
     )
   })
@@ -152,17 +177,17 @@ describe('FlashcardsPage', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2)
   })
 
-  it('wybiera trasę tematu dla przyszłego filtrowania', async () => {
+  it('buduje endpoint dla numerycznego ID tematu', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ items: [], total: 0 }),
     })
     vi.stubGlobal('fetch', fetchMock)
 
-    await fetchFlashcards('topic 12')
+    await fetchFlashcards(12)
 
     expect(fetchMock).toHaveBeenCalledWith(
-      'http://127.0.0.1:8000/api/flashcards/topic/topic%2012',
+      '/api/flashcards/topic/12',
       expect.objectContaining({ signal: undefined }),
     )
   })

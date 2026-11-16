@@ -61,13 +61,13 @@ export default function TopicsPage() {
           <ul aria-label="Tematy" className="divide-y divide-slate-200 border-y border-slate-200">
             {topics.map((topic) => (
               <li key={topic.id}>
-                <button
-                  type="button"
-                  disabled
-                  className="flex min-h-14 w-full cursor-not-allowed items-center justify-between gap-4 py-3 text-left font-medium text-slate-500"
+                <Link
+                  to={`/topics/${topic.id}`}
+                  className="flex min-h-14 w-full items-center justify-between gap-4 py-3 text-left font-medium text-slate-800 hover:text-indigo-700"
                 >
                   <span>{topic.name}</span>
-                </button>
+                  <span aria-hidden="true" className="text-slate-400">›</span>
+                </Link>
               </li>
             ))}
             <li>
