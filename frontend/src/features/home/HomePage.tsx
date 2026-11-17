@@ -1,7 +1,7 @@
 
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
-import { isSessionActive, startSession } from '../../lib/session'
+import { isSessionActive } from '../../lib/session'
 
 
 interface HomeTileProps {
@@ -82,12 +82,8 @@ function HomeTile({
 }
 
 export default function HomePage() {
-    const [isLoggedIn, setIsLoggedIn] = useState(isSessionActive)
+    const [isLoggedIn] = useState(isSessionActive)
 
-    function handleLogin() {
-        startSession()
-        setIsLoggedIn(true)
-    }
     return (
         <main className="min-h-screen bg-slate-50 px-5 py-8 text-slate-900 sm:px-8">
             <div className="mx-auto max-w-3xl">
@@ -114,16 +110,12 @@ export default function HomePage() {
                             title="Zaloguj się/Załóż konto"
                             description={
                                 <>
-                                    Zaloguj się, aby uzyskać dostęp do narzędzi nauki.
-                                    <br />
-                                    <br />
-                                    NOTKA: Tymczasowo loguje użytkownika „od razu” - do
-                                    zintegrowania z demo logowania, gdy zostanie zaimplementowane.
+                                    Zaloguj się lub załóż konto, aby uzyskać dostęp do narzędzi nauki.
                                 </>
                             }
                             accent="border-indigo-600 text-indigo-700"
                             fullWidth
-                            onClick={handleLogin}
+                            to="/login"
                             icon={
                                 <svg
                                     viewBox="0 0 24 24"

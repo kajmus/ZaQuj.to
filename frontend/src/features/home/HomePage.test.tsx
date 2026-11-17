@@ -20,6 +20,7 @@ function renderHomePage() {
           path="/flashcards"
           element={<h1>Strona fiszek</h1>}
         />
+        <Route path="/login" element={<h1>Strona logowania</h1>} />
       </Routes>
     </MemoryRouter>
   )
@@ -28,15 +29,20 @@ function renderHomePage() {
 describe('HomePage', () => {
   beforeEach(() => {
     endSession()
+    sessionStorage.clear()
   })
 
   it('wyświetla przycisk logowania, gdy użytkownik nie jest zalogowany', () => {
     renderHomePage()
 
     expect(
-      screen.getByRole('button', { name: /zaloguj się/i })
+      screen.getByRole('link', { name: /zaloguj się/i })
     ).toBeInTheDocument()
-
+    
+    expect(
+      screen.getByRole('link', { name: /kategorie/i })
+    ).not.toBeInTheDocument()
+    
     expect(
       screen.queryByRole('link', { name: /fiszki/i })
     ).not.toBeInTheDocument()
@@ -46,17 +52,22 @@ describe('HomePage', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('loguje użytkownika po kliknięciu przycisku logowania', async () => {
+  it('przenosi niezalogowanego użytkownika do logowania', async () => {
     const user = userEvent.setup()
 
     renderHomePage()
 
-    await user.click(
-      screen.getByRole('button', { name: /zaloguj się/i })
-    )
+    await user.click(screen.getByRole('link', { name: /zaloguj się/i }))
+    expect(screen.getByRole('heading', { name: 'Strona logowania' })).toBeInTheDocument()
+    expect(isSessionActive()).toBe(false)
 
-    expect(isSessionActive()).toBe(true)
+  })
 
+  it('wyświetla funkcje nauki, gdy użytkownik ma aktywną sesję', () => {
+    startSession(1)
+
+    renderHomePage()
+          
     expect(
       screen.getByRole('link', { name: /kategorie/i })
     ).toBeInTheDocument()
@@ -74,28 +85,10 @@ describe('HomePage', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('wyświetla funkcje nauki, gdy użytkownik ma aktywną sesję', () => {
-    startSession()
-
-    renderHomePage()
-
-    expect(
-      screen.getByRole('link', { name: /fiszki/i })
-    ).toBeInTheDocument()
-
-    expect(
-      screen.getByRole('button', { name: /quizy/i })
-    ).toBeInTheDocument()
-
-    expect(
-      screen.queryByRole('button', { name: /zaloguj się/i })
-    ).not.toBeInTheDocument()
-  })
-
   it('przenosi użytkownika na stronę fiszek po kliknięciu kafelka', async () => {
     const user = userEvent.setup()
 
-    startSession()
+    startSession(1)
     renderHomePage()
 
     await user.click(
@@ -130,7 +123,7 @@ describe('HomePage', () => {
   it('nie pozwala przejść do quizów, ponieważ kafelek jest wyłączony', async () => {
     const user = userEvent.setup()
 
-    startSession()
+    startSession(1)
     renderHomePage()
 
     const quizButton = screen.getByRole('button', {
