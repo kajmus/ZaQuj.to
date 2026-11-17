@@ -16,6 +16,7 @@ function renderHomePage() {
           path="/flashcards"
           element={<h1>Strona fiszek</h1>}
         />
+        <Route path="/login" element={<h1>Strona logowania</h1>} />
       </Routes>
     </MemoryRouter>
   )
@@ -24,13 +25,14 @@ function renderHomePage() {
 describe('HomePage', () => {
   beforeEach(() => {
     endSession()
+    sessionStorage.clear()
   })
 
   it('wyświetla przycisk logowania, gdy użytkownik nie jest zalogowany', () => {
     renderHomePage()
 
     expect(
-      screen.getByRole('button', { name: /zaloguj się/i })
+      screen.getByRole('link', { name: /zaloguj się/i })
     ).toBeInTheDocument()
 
     expect(
@@ -42,32 +44,18 @@ describe('HomePage', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('loguje użytkownika po kliknięciu przycisku logowania', async () => {
+  it('przenosi niezalogowanego użytkownika do logowania', async () => {
     const user = userEvent.setup()
 
     renderHomePage()
 
-    await user.click(
-      screen.getByRole('button', { name: /zaloguj się/i })
-    )
-
-    expect(isSessionActive()).toBe(true)
-
-    expect(
-      screen.getByRole('link', { name: /fiszki/i })
-    ).toBeInTheDocument()
-
-    expect(
-      screen.getByRole('button', { name: /quizy/i })
-    ).toBeInTheDocument()
-
-    expect(
-      screen.queryByRole('button', { name: /zaloguj się/i })
-    ).not.toBeInTheDocument()
+    await user.click(screen.getByRole('link', { name: /zaloguj się/i }))
+    expect(screen.getByRole('heading', { name: 'Strona logowania' })).toBeInTheDocument()
+    expect(isSessionActive()).toBe(false)
   })
 
   it('wyświetla funkcje nauki, gdy użytkownik ma aktywną sesję', () => {
-    startSession()
+    startSession(1)
 
     renderHomePage()
 
@@ -87,7 +75,7 @@ describe('HomePage', () => {
   it('przenosi użytkownika na stronę fiszek po kliknięciu kafelka', async () => {
     const user = userEvent.setup()
 
-    startSession()
+    startSession(1)
     renderHomePage()
 
     await user.click(
@@ -102,7 +90,7 @@ describe('HomePage', () => {
   it('nie pozwala przejść do quizów, ponieważ kafelek jest wyłączony', async () => {
     const user = userEvent.setup()
 
-    startSession()
+    startSession(1)
     renderHomePage()
 
     const quizButton = screen.getByRole('button', {
