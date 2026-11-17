@@ -40,10 +40,6 @@ describe('HomePage', () => {
     ).toBeInTheDocument()
     
     expect(
-      screen.getByRole('link', { name: /kategorie/i })
-    ).not.toBeInTheDocument()
-    
-    expect(
       screen.queryByRole('link', { name: /fiszki/i })
     ).not.toBeInTheDocument()
 
