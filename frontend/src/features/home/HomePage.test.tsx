@@ -103,7 +103,7 @@ describe('HomePage', () => {
   it('pokazuje Kategorie przed Fiszkami i otwiera menu kategorii', async () => {
     const user = userEvent.setup()
 
-    startSession()
+    startSession(1)
     renderHomePage()
 
     const learningLinks = screen.getAllByRole('link')
