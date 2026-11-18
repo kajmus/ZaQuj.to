@@ -13,6 +13,10 @@ function renderHomePage() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route
+          path="/categories"
+          element={<h1>Menu kategorii</h1>}
+        />
+        <Route
           path="/flashcards"
           element={<h1>Strona fiszek</h1>}
         />
@@ -34,7 +38,7 @@ describe('HomePage', () => {
     expect(
       screen.getByRole('link', { name: /zaloguj się/i })
     ).toBeInTheDocument()
-
+    
     expect(
       screen.queryByRole('link', { name: /fiszki/i })
     ).not.toBeInTheDocument()
@@ -52,12 +56,17 @@ describe('HomePage', () => {
     await user.click(screen.getByRole('link', { name: /zaloguj się/i }))
     expect(screen.getByRole('heading', { name: 'Strona logowania' })).toBeInTheDocument()
     expect(isSessionActive()).toBe(false)
+
   })
 
   it('wyświetla funkcje nauki, gdy użytkownik ma aktywną sesję', () => {
     startSession(1)
 
     renderHomePage()
+          
+    expect(
+      screen.getByRole('link', { name: /kategorie/i })
+    ).toBeInTheDocument()
 
     expect(
       screen.getByRole('link', { name: /fiszki/i })
@@ -84,6 +93,26 @@ describe('HomePage', () => {
 
     expect(
       screen.getByRole('heading', { name: 'Strona fiszek' })
+    ).toBeInTheDocument()
+  })
+
+  it('pokazuje Kategorie przed Fiszkami i otwiera menu kategorii', async () => {
+    const user = userEvent.setup()
+
+    startSession(1)
+    renderHomePage()
+
+    const learningLinks = screen.getAllByRole('link')
+    const categoriesLink = screen.getByRole('link', { name: /kategorie/i })
+    const flashcardsLink = screen.getByRole('link', { name: /fiszki/i })
+    expect(learningLinks.indexOf(categoriesLink)).toBeLessThan(
+      learningLinks.indexOf(flashcardsLink),
+    )
+
+    await user.click(categoriesLink)
+
+    expect(
+      screen.getByRole('heading', { name: 'Menu kategorii' }),
     ).toBeInTheDocument()
   })
 

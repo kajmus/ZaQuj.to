@@ -135,6 +135,29 @@ export default function HomePage() {
                     ) : (
                         <>
                             <HomeTile
+                                title="Kategorie"
+                                description="Przeglądaj kategorie i wybierz temat do nauki."
+                                accent="border-emerald-700 text-emerald-700"
+                                to="/categories"
+                                icon={
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.8"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        aria-hidden="true"
+                                    >
+                                        <rect x="3" y="4" width="8" height="7" rx="1" />
+                                        <rect x="13" y="4" width="8" height="7" rx="1" />
+                                        <rect x="3" y="13" width="8" height="7" rx="1" />
+                                        <rect x="13" y="13" width="8" height="7" rx="1" />
+                                    </svg>
+                                }
+                            />
+
+                            <HomeTile
                                 title="Fiszki"
                                 description="Twórz zestawy i utrwalaj wiedzę za pomocą fiszek."
                                 accent="border-teal-700 text-teal-700"
