@@ -71,13 +71,13 @@ export default function TopicsPage() {
               </li>
             ))}
             <li>
-              <button
-                type="button"
-                disabled
-                className="flex min-h-14 w-full cursor-not-allowed items-center justify-between gap-4 py-3 text-left font-semibold text-indigo-400"
+              <Link
+                to={isAllCategories ? '/all' : `/categories/${categoryId}/all`}
+                className="flex min-h-14 w-full items-center justify-between gap-4 py-3 text-left font-semibold text-indigo-700 hover:text-indigo-900"
               >
                 <span>Wszystkie</span>
-              </button>
+                <span aria-hidden="true">›</span>
+              </Link>
             </li>
           </ul>
         )}

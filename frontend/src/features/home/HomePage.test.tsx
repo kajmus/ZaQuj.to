@@ -1,4 +1,3 @@
-
 import { afterEach, describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -101,7 +100,7 @@ describe('HomePage', () => {
       within(screen.getByRole('navigation', { name: 'Kategorie' })).getByRole('link', {
         name: 'Wszystkie',
       }),
-    ).toHaveAttribute('href', '/categories/all/topics')
+    ).toHaveAttribute('href', '/all')
 
     expect(
       screen.queryByRole('button', { name: /zaloguj się/i })

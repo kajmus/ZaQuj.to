@@ -45,11 +45,11 @@ describe('menu kategorii i tematów', () => {
       'href',
       '/categories/8/topics',
     )
-    expect(allCategoriesLink).toHaveAttribute('href', '/categories/all/topics')
+    expect(allCategoriesLink).toHaveAttribute('href', '/all')
     expect(fetchMock).toHaveBeenCalledWith('/api/categories/')
   })
 
-  it('pobiera tematy, linkuje wybrane tematy i pozostawia „Wszystkie” nieaktywne', async () => {
+  it('pobiera tematy i aktywuje „Wszystkie” dla kategorii', async () => {
     const fetchMock = vi.fn((input: RequestInfo | URL) => {
       const url = String(input)
       if (url.endsWith('/topics/category/3')) {
@@ -69,7 +69,10 @@ describe('menu kategorii i tematów', () => {
       'href',
       '/topics/12',
     )
-    expect(screen.getByRole('button', { name: 'Wszystkie' })).toBeDisabled()
+    expect(screen.getByRole('link', { name: 'Wszystkie' })).toHaveAttribute(
+      'href',
+      '/categories/3/all',
+    )
     expect(fetchMock).toHaveBeenCalledWith('/api/topics/category/3')
     expect(fetchMock).toHaveBeenCalledWith('/api/categories/3')
   })
@@ -88,8 +91,10 @@ describe('menu kategorii i tematów', () => {
       'href',
       '/topics/21',
     )
-    expect(screen.getByRole('button', { name: 'Wszystkie' })).toBeDisabled()
-    expect(fetchMock).toHaveBeenCalledOnce()
+    expect(screen.getByRole('link', { name: 'Wszystkie' })).toHaveAttribute(
+      'href',
+      '/all',
+    )
     expect(fetchMock).toHaveBeenCalledWith('/api/topics/')
   })
 

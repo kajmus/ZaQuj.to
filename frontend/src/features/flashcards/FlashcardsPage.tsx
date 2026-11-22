@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import Flashcard, { type FlashcardData } from './Flashcard'
-import { fetchFlashcards } from './flashcards-api'
+import { fetchCategoryFlashcards, fetchFlashcards } from './flashcards-api'
 
 interface FlashcardsPageProps {
   cards?: FlashcardData[]
@@ -10,8 +10,9 @@ interface FlashcardsPageProps {
 type FlashcardRating = 'incorrect' | 'correct'
 
 export default function FlashcardsPage({ cards }: FlashcardsPageProps) {
-  const { topicId: routeTopicId } = useParams()
+  const { topicId: routeTopicId, categoryId: routeCategoryId } = useParams()
   const topicId = routeTopicId === undefined ? undefined : Number(routeTopicId)
+  const categoryId = routeCategoryId === undefined ? undefined : Number(routeCategoryId)
   const [loadedCards, setLoadedCards] = useState<FlashcardData[]>([])
   const [loadState, setLoadState] = useState<'loading' | 'error' | 'success'>(
     cards === undefined ? 'loading' : 'success',
@@ -33,7 +34,11 @@ export default function FlashcardsPage({ cards }: FlashcardsPageProps) {
 
     const controller = new AbortController()
 
-    fetchFlashcards(topicId, controller.signal)
+    const loadCards = categoryId !== undefined
+      ? fetchCategoryFlashcards(categoryId, controller.signal)
+      : fetchFlashcards(topicId, controller.signal)
+
+    loadCards
       .then((result) => {
         setLoadedCards(result)
         setLoadState('success')
@@ -43,7 +48,7 @@ export default function FlashcardsPage({ cards }: FlashcardsPageProps) {
       })
 
     return () => controller.abort()
-  }, [cards, retryCount, topicId])
+  }, [cards, retryCount, topicId, categoryId])
 
   function showPreviousCard() {
     setCurrentIndex((index) => Math.max(index - 1, 0))
