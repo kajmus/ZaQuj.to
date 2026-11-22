@@ -8,6 +8,7 @@ import TopicsPage from '../features/categories/TopicsPage'
 import TopicPage from '../features/categories/TopicPage'
 import { CounterProvider } from '../features/state-demo/CounterContext'
 import AuthPage from '../features/auth/AuthPage'
+import AllQuestionsPage from '../features/home/AllQuestionsPage'
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/all" element={<AllQuestionsPage />} />
         <Route path="/login" element={<AuthPage />} />
         <Route path="/dummy" element={<DummyPage />} />
         <Route path="/categories" element={<CategoriesPage />} />
