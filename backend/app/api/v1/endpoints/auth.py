@@ -1,11 +1,13 @@
-from fastapi import APIRouter , HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from app.core.security import our_hash
 from app.schemas import UserRegister , SessionVerifySchema
 from app.crud.user import * 
 from app.crud.user_session import *
-from app.dependencies import *
+from app.dependencies import DBSession, user_session_validate
+from app.models.user import User
+from app.models.user_session import UserSession
 from sqlalchemy.future import select
-from datetime import datetime, timedelta
+from sqlalchemy.ext.asyncio import AsyncSession
 
 auth_router = APIRouter(prefix="",tags =["auth"])
 
@@ -73,29 +75,8 @@ async def auth_delete_session(session_id_r: int, db: AsyncSession = DBSession ):
     return None
         
     
-@auth_router.post("/me")
-async def check_session_me(data: SessionVerifySchema,  db: AsyncSession =DBSession ):
-    session_id = data.session_id
-
-    result = await db.execute(select(UserSession).where(UserSession.id_session == session_id))
-    session = result.scalars().first()
-
-    if not session or (session.started_at + timedelta(days=3)) < datetime.utcnow():
-        if session:
-            await db.delete(session)
-            await db.commit()
-            
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Sesja wygasła. Zaloguj się ponownie."
-        )
-
-    session.started_at = datetime.utcnow()
-    await db.commit()
-
-    user_result = await db.execute(select(User).where(User.id_user == session.id_user))
-    user = user_result.scalars().first()
-
+@auth_router.get("/me")
+async def check_session_me(user: User = Depends(user_session_validate)):
     return {
         "id_user": user.id_user,
         "login": user.login
