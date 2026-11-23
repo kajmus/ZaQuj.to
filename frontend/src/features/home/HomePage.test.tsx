@@ -1,5 +1,5 @@
 import { afterEach, describe, it, expect, beforeEach, vi } from 'vitest'
-import { render, screen, within } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 
@@ -96,12 +96,6 @@ describe('HomePage', () => {
       'href',
       '/categories/3/topics',
     )
-    expect(
-      within(screen.getByRole('navigation', { name: 'Kategorie' })).getByRole('link', {
-        name: 'Wszystkie',
-      }),
-    ).toHaveAttribute('href', '/all')
-
     expect(
       screen.queryByRole('button', { name: /zaloguj się/i })
     ).not.toBeInTheDocument()

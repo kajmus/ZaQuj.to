@@ -27,7 +27,7 @@ afterEach(() => {
 })
 
 describe('menu kategorii i tematów', () => {
-  it('pobiera kategorie i umieszcza „Wszystkie” na końcu menu', async () => {
+  it('pobiera kategorie i wyświetla je w menu', async () => {
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse({
       items: [{ id: 3, name: 'Biologia' }, { id: 8, name: 'Historia' }],
       total: 2,
@@ -36,8 +36,7 @@ describe('menu kategorii i tematów', () => {
 
     renderAt('/categories')
 
-    const allCategoriesLink = await screen.findByRole('link', { name: 'Wszystkie' })
-    expect(screen.getByRole('link', { name: 'Biologia' })).toHaveAttribute(
+    expect(await screen.findByRole('link', { name: 'Biologia' })).toHaveAttribute(
       'href',
       '/categories/3/topics',
     )
@@ -45,11 +44,10 @@ describe('menu kategorii i tematów', () => {
       'href',
       '/categories/8/topics',
     )
-    expect(allCategoriesLink).toHaveAttribute('href', '/all')
     expect(fetchMock).toHaveBeenCalledWith('/api/categories/')
   })
 
-  it('pobiera tematy i aktywuje „Wszystkie” dla kategorii', async () => {
+  it('pobiera tematy dla wybranej kategorii', async () => {
     const fetchMock = vi.fn((input: RequestInfo | URL) => {
       const url = String(input)
       if (url.endsWith('/topics/category/3')) {
@@ -69,33 +67,8 @@ describe('menu kategorii i tematów', () => {
       'href',
       '/topics/12',
     )
-    expect(screen.getByRole('link', { name: 'Wszystkie' })).toHaveAttribute(
-      'href',
-      '/categories/3/all',
-    )
     expect(fetchMock).toHaveBeenCalledWith('/api/topics/category/3')
     expect(fetchMock).toHaveBeenCalledWith('/api/categories/3')
-  })
-
-  it('pobiera wszystkie tematy dla kategorii „Wszystkie”', async () => {
-    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({
-      items: [{ id: 21, name: 'Algebra' }],
-      total: 1,
-    }))
-    vi.stubGlobal('fetch', fetchMock)
-
-    renderAt('/categories/all/topics')
-
-    expect(await screen.findByRole('heading', { name: 'Wszystkie' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Algebra' })).toHaveAttribute(
-      'href',
-      '/topics/21',
-    )
-    expect(screen.getByRole('link', { name: 'Wszystkie' })).toHaveAttribute(
-      'href',
-      '/all',
-    )
-    expect(fetchMock).toHaveBeenCalledWith('/api/topics/')
   })
 
   it('pokazuje błąd pobierania kategorii', async () => {

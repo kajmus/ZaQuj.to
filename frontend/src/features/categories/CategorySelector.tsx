@@ -37,15 +37,6 @@ export default function CategorySelector() {
                 </Link>
               </li>
             ))}
-            <li>
-              <Link
-                to="/all"
-                className="flex min-h-14 items-center justify-between gap-4 py-3 font-semibold text-indigo-700 hover:text-indigo-900"
-              >
-                <span>Wszystkie</span>
-                <span aria-hidden="true">›</span>
-              </Link>
-            </li>
           </ul>
         </nav>
       )}
