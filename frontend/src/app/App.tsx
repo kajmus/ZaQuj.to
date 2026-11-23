@@ -8,6 +8,7 @@ import TopicsPage from '../features/categories/TopicsPage'
 import TopicPage from '../features/categories/TopicPage'
 import { CounterProvider } from '../features/state-demo/CounterContext'
 import AuthPage from '../features/auth/AuthPage'
+import RequireAuth from './RequireAuth'
 
 export default function App() {
   return (
@@ -16,12 +17,14 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<AuthPage />} />
-        <Route path="/dummy" element={<DummyPage />} />
-        <Route path="/categories" element={<CategoriesPage />} />
-        <Route path="/categories/:categoryId/topics" element={<TopicsPage />} />
-        <Route path="/topics/:topicId" element={<TopicPage />} />
-        <Route path="/flashcards" element={<FlashcardsPage />} />
-        <Route path="/flashcards/topic/:topicId" element={<FlashcardsPage />} />
+        <Route element={<RequireAuth />}>
+          <Route path="/dummy" element={<DummyPage />} />
+          <Route path="/categories" element={<CategoriesPage />} />
+          <Route path="/categories/:categoryId/topics" element={<TopicsPage />} />
+          <Route path="/topics/:topicId" element={<TopicPage />} />
+          <Route path="/flashcards" element={<FlashcardsPage />} />
+          <Route path="/flashcards/topic/:topicId" element={<FlashcardsPage />} />
+        </Route>
       </Routes>
     </BrowserRouter>
     </CounterProvider>

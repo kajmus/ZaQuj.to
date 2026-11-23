@@ -1,7 +1,8 @@
 
 import { Link } from 'react-router-dom'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { isSessionActive } from '../../lib/session'
+import LogoutButton from '../auth/LogoutButton'
 
 
 interface HomeTileProps {
@@ -82,10 +83,20 @@ function HomeTile({
 }
 
 export default function HomePage() {
-    const [isLoggedIn] = useState(isSessionActive)
+    const [isLoggedIn, setIsLoggedIn] = useState(isSessionActive)
+
+    useEffect(() => {
+        function syncSession() {
+            setIsLoggedIn(isSessionActive())
+        }
+
+        window.addEventListener('app-session-change', syncSession)
+        return () => window.removeEventListener('app-session-change', syncSession)
+    }, [])
 
     return (
         <main className="min-h-screen bg-slate-50 px-5 py-8 text-slate-900 sm:px-8">
+            {isLoggedIn && <LogoutButton />}
             <div className="mx-auto max-w-3xl">
                 <header className="mb-10">
                     <p className="text-sm font-semibold uppercase tracking-widest text-indigo-700">
