@@ -28,6 +28,10 @@ class User(Base):
         back_populates="user"
     )
 
+    question_progress: Mapped[list["QuestionProgress"]] = relationship(
+        "QuestionProgress", back_populates="user"
+    )
+
     session: Mapped["UserSession"] = relationship(
         "UserSession", 
         back_populates="user", 

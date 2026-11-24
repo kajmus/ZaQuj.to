@@ -6,3 +6,4 @@ from app.models.abcd_question import ABCDQuestion
 from app.models.test import Test
 from app.models.result import Result
 from app.models.user_session import UserSession
+from app.models.question_progress import QuestionProgress

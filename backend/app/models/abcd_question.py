@@ -52,3 +52,7 @@ class ABCDQuestion(Base):
         "Result",
         back_populates="question"
     )
+
+    user_progress: Mapped[list["QuestionProgress"]] = relationship(
+        "QuestionProgress", back_populates="question"
+    )
