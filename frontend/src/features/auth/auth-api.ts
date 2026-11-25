@@ -5,25 +5,30 @@ export interface AuthUser {
   login: string
 }
 
+type RequestOptions =
+  | { method: 'GET'; headers?: Record<string, string> }
+  | { method: 'POST'; body: unknown; headers?: Record<string, string> }
+
 async function request<T>(
   path: string,
-  options: {
-    method?: 'GET' | 'POST'
-    body?: unknown
-    headers?: Record<string, string>
-  } = {},
+  options: RequestOptions,
 ): Promise<T> {
-  const { method = 'POST', body, headers = {} } = options
+  const { method, headers = {} } = options
+  const requestOptions: RequestInit = {
+    method,
+    headers: { ...headers },
+  }
+  if (method === 'POST') {
+    requestOptions.headers = {
+      'Content-Type': 'application/json',
+      ...headers,
+    }
+    requestOptions.body = JSON.stringify(options.body)
+  }
+
   let response: Response
   try {
-    response = await fetch(`${API_BASE_URL}${path}`, {
-      method,
-      headers: {
-        ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
-        ...headers,
-      },
-      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
-    })
+    response = await fetch(`${API_BASE_URL}${path}`, requestOptions)
   } catch {
     throw new Error('Nie udało się połączyć z serwerem. Spróbuj ponownie.')
   }
@@ -43,11 +48,11 @@ async function request<T>(
 }
 
 export function registerUser(name: string, password: string): Promise<unknown> {
-  return request('/users/register', { body: { name, password } })
+  return request('/users/register', { method: 'POST', body: { name, password } })
 }
 
 export function loginUser(name: string, password: string): Promise<number> {
-  return request('/auth/login', { body: { name, password } })
+  return request('/auth/login', { method: 'POST', body: { name, password } })
 }
 
 export function verifySession(sessionId: number): Promise<AuthUser> {
@@ -58,5 +63,6 @@ export function verifySession(sessionId: number): Promise<AuthUser> {
 }
 
 export function logoutUser(sessionId: number): Promise<{ message: string }> {
-  return request('/auth/logout', { body: { session_id: sessionId } })
+  return request('/auth/logout', { 
+    method: 'POST', body: { session_id: sessionId } })
 }
