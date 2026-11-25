@@ -191,4 +191,52 @@ describe('FlashcardsPage', () => {
       expect.objectContaining({ signal: undefined }),
     )
   })
+
+  it('łączy fiszki ze wszystkich tematów wybranej kategorii', async () => {
+    const fetchMock = vi.fn((input: RequestInfo | URL) => {
+      const url = String(input)
+      if (url === '/api/topics/category/3') {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            items: [{ id: 12, name: 'Komórka' }, { id: 13, name: 'Tkanki' }],
+            total: 2,
+          }),
+        })
+      }
+      if (url === '/api/flashcards/topic/12') {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            items: [{ id: 101, front_text: 'Pytanie komórkowe', back_text: 'Odpowiedź komórkowa' }],
+            total: 1,
+          }),
+        })
+      }
+      if (url === '/api/flashcards/topic/13') {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            items: [{ id: 102, front_text: 'Pytanie tkankowe', back_text: 'Odpowiedź tkankowa' }],
+            total: 1,
+          }),
+        })
+      }
+      return Promise.reject(new Error(`Nieoczekiwany URL: ${url}`))
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    render(
+      <MemoryRouter initialEntries={['/flashcards/category/3']}>
+        <Routes>
+          <Route path="/flashcards/category/:categoryId" element={<FlashcardsPage />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByText('Pytanie komórkowe')).toBeInTheDocument()
+    expect(fetchMock).toHaveBeenCalledWith('/api/topics/category/3')
+    expect(fetchMock).toHaveBeenCalledWith('/api/flashcards/topic/12', expect.anything())
+    expect(fetchMock).toHaveBeenCalledWith('/api/flashcards/topic/13', expect.anything())
+  })
 })

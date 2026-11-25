@@ -45,3 +45,8 @@ export async function fetchTopics(categoryId: number | 'all'): Promise<Topic[]> 
   const response = await getJson<ListResponse<Topic>>(path)
   return response.items
 }
+
+export async function fetchCategoryTopicIds(categoryId: number): Promise<number[]> {
+  const topics = await fetchTopics(categoryId)
+  return topics.map((topic) => topic.id)
+}

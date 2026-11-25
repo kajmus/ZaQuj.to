@@ -1,4 +1,5 @@
 import type { FlashcardData } from './Flashcard'
+import { fetchCategoryTopicIds } from '../categories/api'
 
 interface FlashcardApiResponse {
   items: {
@@ -29,4 +30,15 @@ export async function fetchFlashcards(
     frontText: item.front_text,
     backText: item.back_text,
   }))
+}
+
+export async function fetchCategoryFlashcards(
+  categoryId: number,
+  signal?: AbortSignal,
+): Promise<FlashcardData[]> {
+  const topicIds = await fetchCategoryTopicIds(categoryId)
+  const cardsByTopic = await Promise.all(
+    topicIds.map((topicId) => fetchFlashcards(topicId, signal)),
+  )
+  return cardsByTopic.flat()
 }
