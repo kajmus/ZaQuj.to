@@ -35,17 +35,26 @@ describe('Aplikacja i nawigacja', () => {
     expect(localStorage.getItem('app_session')).toBeNull()
   })
 
-  it('wyświetla funkcje nauki po odświeżeniu aplikacji z aktywną sesją', () => {
+  it('otwiera wybór globalnej nauki po odświeżeniu z aktywną sesją', async () => {
+    const user = userEvent.setup()
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({
+      items: [],
+      total: 0,
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    })))
     localStorage.setItem('app_session', '23')
 
     render(<App />)
 
-    expect(
-      screen.getByRole('link', { name: /fiszki/i }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /^Wszystkie/ })).toHaveAttribute('href', '/all')
+    expect(screen.getByRole('button', { name: /mój profil/i })).toBeDisabled()
+    expect(screen.getByRole('button', { name: /powtórka/i })).toBeDisabled()
 
-    expect(
-      screen.getByRole('button', { name: /quizy/i }),
-    ).toBeDisabled()
+    await user.click(screen.getByRole('link', { name: /^Wszystkie/ }))
+    expect(screen.getByRole('heading', { name: 'Wszystkie pytania' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /fiszki/i })).toHaveAttribute('href', '/flashcards')
+    expect(screen.getByRole('button', { name: /quizy/i })).toBeDisabled()
   })
 })

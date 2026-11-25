@@ -1,20 +1,28 @@
-
-import { describe, it, expect, beforeEach } from 'vitest'
+import { afterEach, describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 
 import HomePage from './HomePage'
+import AllQuestionsPage from './AllQuestionsPage'
 import { isSessionActive, startSession, endSession } from '../../lib/session'
+
+function jsonResponse(data: unknown) {
+  return new Response(JSON.stringify(data), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' },
+  })
+}
 
 function renderHomePage() {
   return render(
     <MemoryRouter initialEntries={['/']}>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/all" element={<AllQuestionsPage />} />
         <Route
-          path="/categories"
-          element={<h1>Menu kategorii</h1>}
+          path="/categories/:categoryId/topics"
+          element={<h1>Tematy kategorii</h1>}
         />
         <Route
           path="/flashcards"
@@ -32,6 +40,10 @@ describe('HomePage', () => {
     sessionStorage.clear()
   })
 
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
   it('wyświetla przycisk logowania, gdy użytkownik nie jest zalogowany', () => {
     renderHomePage()
 
@@ -40,7 +52,7 @@ describe('HomePage', () => {
     ).toBeInTheDocument()
     
     expect(
-      screen.queryByRole('link', { name: /fiszki/i })
+      screen.queryByRole('link', { name: /wszystkie/i })
     ).not.toBeInTheDocument()
 
     expect(
@@ -59,79 +71,91 @@ describe('HomePage', () => {
 
   })
 
-  it('wyświetla funkcje nauki, gdy użytkownik ma aktywną sesję', () => {
+  it('wyświetla nowe akcje i listę kategorii dla aktywnej sesji', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({
+      items: [{ id: 3, name: 'Biologia' }],
+      total: 1,
+    })))
     startSession(1)
 
     renderHomePage()
-          
-    expect(
-      screen.getByRole('link', { name: /kategorie/i })
-    ).toBeInTheDocument()
 
     expect(
-      screen.getByRole('link', { name: /fiszki/i })
-    ).toBeInTheDocument()
+      screen.getByRole('link', { name: /^Wszystkie/ })
+    ).toHaveAttribute('href', '/all')
 
     expect(
-      screen.getByRole('button', { name: /quizy/i })
-    ).toBeInTheDocument()
+      screen.getByRole('button', { name: /powtórka/i })
+    ).toBeDisabled()
 
+    expect(
+      screen.getByRole('button', { name: /mój profil/i })
+    ).toBeDisabled()
+
+    expect(await screen.findByRole('link', { name: 'Biologia' })).toHaveAttribute(
+      'href',
+      '/categories/3/topics',
+    )
     expect(
       screen.queryByRole('button', { name: /zaloguj się/i })
     ).not.toBeInTheDocument()
   })
 
-  it('przenosi użytkownika na stronę fiszek po kliknięciu kafelka', async () => {
+  it('przenosi użytkownika do wyboru trybu dla wszystkich pytań', async () => {
     const user = userEvent.setup()
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ items: [], total: 0 })))
 
     startSession(1)
     renderHomePage()
 
     await user.click(
-      screen.getByRole('link', { name: /fiszki/i })
+      screen.getByRole('link', { name: /^Wszystkie/ })
     )
 
     expect(
-      screen.getByRole('heading', { name: 'Strona fiszek' })
+      screen.getByRole('heading', { name: 'Wszystkie pytania' })
     ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /fiszki/i })).toHaveAttribute(
+      'href',
+      '/flashcards',
+    )
+    expect(screen.getByRole('button', { name: /quizy/i })).toBeDisabled()
   })
 
-  it('pokazuje Kategorie przed Fiszkami i otwiera menu kategorii', async () => {
+  it('otwiera tematy po wybraniu kategorii z homepage', async () => {
     const user = userEvent.setup()
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({
+      items: [{ id: 3, name: 'Biologia' }],
+      total: 1,
+    })))
 
     startSession(1)
     renderHomePage()
 
-    const learningLinks = screen.getAllByRole('link')
-    const categoriesLink = screen.getByRole('link', { name: /kategorie/i })
-    const flashcardsLink = screen.getByRole('link', { name: /fiszki/i })
-    expect(learningLinks.indexOf(categoriesLink)).toBeLessThan(
-      learningLinks.indexOf(flashcardsLink),
-    )
-
-    await user.click(categoriesLink)
+    await user.click(await screen.findByRole('link', { name: 'Biologia' }))
 
     expect(
-      screen.getByRole('heading', { name: 'Menu kategorii' }),
+      screen.getByRole('heading', { name: 'Tematy kategorii' }),
     ).toBeInTheDocument()
   })
 
-  it('nie pozwala przejść do quizów, ponieważ kafelek jest wyłączony', async () => {
+  it('nie pozwala rozpocząć powtórki, ponieważ akcja jest wyłączona', async () => {
     const user = userEvent.setup()
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ items: [], total: 0 })))
 
     startSession(1)
     renderHomePage()
 
-    const quizButton = screen.getByRole('button', {
-      name: /quizy/i,
+    const reviewButton = screen.getByRole('button', {
+      name: /powtórka/i,
     })
 
-    expect(quizButton).toBeDisabled()
+    expect(reviewButton).toBeDisabled()
 
-    await user.click(quizButton)
+    await user.click(reviewButton)
 
     expect(
-      screen.queryByRole('heading', { name: 'Strona fiszek' })
+      screen.queryByRole('heading', { name: 'Wszystkie pytania' })
     ).not.toBeInTheDocument()
   })
 })

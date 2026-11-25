@@ -2,6 +2,7 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import { isSessionActive } from '../../lib/session'
+import CategorySelector from '../categories/CategorySelector'
 
 
 interface HomeTileProps {
@@ -88,17 +89,32 @@ export default function HomePage() {
         <main className="min-h-screen bg-slate-50 px-5 py-8 text-slate-900 sm:px-8">
             <div className="mx-auto max-w-3xl">
                 <header className="mb-10">
-                    <p className="text-sm font-semibold uppercase tracking-widest text-indigo-700">
-                        ZaQuj.to
-                    </p>
+                    <div className="flex items-start justify-between gap-4">
+                        <div>
+                            <p className="text-sm font-semibold uppercase tracking-widest text-indigo-700">
+                                ZaQuj.to
+                            </p>
 
-                    <h1 className="mt-2 text-3xl font-bold">
-                        Co dziś powtarzamy?
-                    </h1>
+                            <h1 className="mt-2 text-3xl font-bold">
+                                Co dziś powtarzamy?
+                            </h1>
 
-                    <p className="mt-3 text-slate-600">
-                        Wybierz sposób nauki i przejdź do działania.
-                    </p>
+                            <p className="mt-3 text-slate-600">
+                                Wybierz sposób nauki i przejdź do działania.
+                            </p>
+                        </div>
+
+                        {isLoggedIn && (
+                            <button
+                                type="button"
+                                disabled
+                                aria-disabled="true"
+                                className="shrink-0 cursor-not-allowed rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-500 opacity-60"
+                            >
+                                Mój profil
+                            </button>
+                        )}
+                    </div>
                 </header>
 
                 <section
@@ -135,10 +151,10 @@ export default function HomePage() {
                     ) : (
                         <>
                             <HomeTile
-                                title="Kategorie"
-                                description="Przeglądaj kategorie i wybierz temat do nauki."
-                                accent="border-emerald-700 text-emerald-700"
-                                to="/categories"
+                                title="Wszystkie"
+                                description="Wybierz tryb nauki dla pytań z całej bazy."
+                                accent="border-indigo-700 text-indigo-700"
+                                to="/all"
                                 icon={
                                     <svg
                                         viewBox="0 0 24 24"
@@ -149,39 +165,17 @@ export default function HomePage() {
                                         strokeLinejoin="round"
                                         aria-hidden="true"
                                     >
-                                        <rect x="3" y="4" width="8" height="7" rx="1" />
-                                        <rect x="13" y="4" width="8" height="7" rx="1" />
-                                        <rect x="3" y="13" width="8" height="7" rx="1" />
-                                        <rect x="13" y="13" width="8" height="7" rx="1" />
+                                        <path d="M4 5h16M4 12h16M4 19h16" />
+                                        <circle cx="7" cy="5" r="1" fill="currentColor" />
+                                        <circle cx="12" cy="12" r="1" fill="currentColor" />
+                                        <circle cx="17" cy="19" r="1" fill="currentColor" />
                                     </svg>
                                 }
                             />
 
                             <HomeTile
-                                title="Fiszki"
-                                description="Twórz zestawy i utrwalaj wiedzę za pomocą fiszek."
-                                accent="border-teal-700 text-teal-700"
-                                to="/flashcards"
-                                icon={
-                                    <svg
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="1.8"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        aria-hidden="true"
-                                    >
-                                        <rect x="3" y="4" width="15" height="16" rx="2" />
-                                        <path d="M7 8h7M7 12h7M7 16h4" />
-                                        <path d="M18 7h3v13a1 1 0 0 1-1 1" />
-                                    </svg>
-                                }
-                            />
-
-                            <HomeTile
-                                title="Quizy"
-                                description="Sprawdź swoją wiedzę i zobacz, ile już pamiętasz."
+                                title="Powtórka"
+                                description="Wróć do pytań, które wymagają jeszcze utrwalenia."
                                 accent="border-slate-400 text-slate-500"
                                 disabled
                                 icon={
@@ -194,15 +188,24 @@ export default function HomePage() {
                                         strokeLinejoin="round"
                                         aria-hidden="true"
                                     >
-                                        <circle cx="12" cy="12" r="9" />
-                                        <path d="M9.5 9a2.5 2.5 0 1 1 4.2 1.8c-1.1 1-1.7 1.2-1.7 2.7" />
-                                        <path d="M12 17h.01" />
+                                        <path d="M3 12a9 9 0 0 1 15.4-6.4L21 8" />
+                                        <path d="M21 3v5h-5M21 12a9 9 0 0 1-15.4 6.4L3 16" />
+                                        <path d="M3 21v-5h5" />
                                     </svg>
                                 }
                             />
                         </>
                     )}
                 </section>
+
+                {isLoggedIn && (
+                    <section aria-labelledby="categories-heading" className="mt-10">
+                        <h2 id="categories-heading" className="mb-4 text-xl font-bold">
+                            Kategorie
+                        </h2>
+                        <CategorySelector />
+                    </section>
+                )}
             </div>
         </main>
     )
