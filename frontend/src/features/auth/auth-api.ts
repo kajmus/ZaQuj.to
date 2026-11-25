@@ -5,14 +5,30 @@ export interface AuthUser {
   login: string
 }
 
-async function request<T>(path: string, body: unknown): Promise<T> {
+type RequestOptions =
+  | { method: 'GET'; headers?: Record<string, string> }
+  | { method: 'POST'; body: unknown; headers?: Record<string, string> }
+
+async function request<T>(
+  path: string,
+  options: RequestOptions,
+): Promise<T> {
+  const { method, headers = {} } = options
+  const requestOptions: RequestInit = {
+    method,
+    headers: { ...headers },
+  }
+  if (method === 'POST') {
+    requestOptions.headers = {
+      'Content-Type': 'application/json',
+      ...headers,
+    }
+    requestOptions.body = JSON.stringify(options.body)
+  }
+
   let response: Response
   try {
-    response = await fetch(`${API_BASE_URL}${path}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    })
+    response = await fetch(`${API_BASE_URL}${path}`, requestOptions)
   } catch {
     throw new Error('Nie udało się połączyć z serwerem. Spróbuj ponownie.')
   }
@@ -32,17 +48,21 @@ async function request<T>(path: string, body: unknown): Promise<T> {
 }
 
 export function registerUser(name: string, password: string): Promise<unknown> {
-  return request('/users/register', { name, password })
+  return request('/users/register', { method: 'POST', body: { name, password } })
 }
 
 export function loginUser(name: string, password: string): Promise<number> {
-  return request('/auth/login', { name, password })
+  return request('/auth/login', { method: 'POST', body: { name, password } })
 }
 
 export function verifySession(sessionId: number): Promise<AuthUser> {
-  return request('/auth/me', { session_id: sessionId })
+  return request('/auth/me', {
+    method: 'GET',
+    headers: { 'Session-Id': String(sessionId) },
+  })
 }
 
 export function logoutUser(sessionId: number): Promise<{ message: string }> {
-  return request('/auth/logout', { session_id: sessionId })
+  return request('/auth/logout', { 
+    method: 'POST', body: { session_id: sessionId } })
 }
