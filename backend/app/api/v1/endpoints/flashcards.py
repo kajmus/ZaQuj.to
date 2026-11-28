@@ -1,9 +1,10 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from app.schemas.flashcards import FlashcardListResponse, FlashcardResponse
 from app.services.flashcard_service import *
-from app.dependencies import DBSession
+from app.dependencies import DBSession, user_session_validate
 from app.crud import abcd_question as db
 from app.models.abcd_question import ABCDQuestion
+from app.models.user import User
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional, Sequence
 
@@ -24,6 +25,44 @@ async def get_flashcards_by_topic(topic_id: int, session: AsyncSession = DBSessi
     # in empty list is send instead of 404 if there are no flashcards assigned to the topic
     return flashcards
 
+@flashcard_router.get("/incorrect", response_model=FlashcardListResponse)
+async def get_flashcards_with_incorrect_results(
+    session: AsyncSession = DBSession,
+    current_user: User = Depends(user_session_validate),
+):
+    questions = await db.get_questions_with_incorrect_answers(
+        session, current_user.id_user
+    )
+    return map_abcd_questions_seq_to_flashcard(questions)
+
+@flashcard_router.get(
+    "/incorrect/category/{category_id}",
+    response_model=FlashcardListResponse,
+)
+async def get_incorrect_flashcards_by_category(
+    category_id: int,
+    session: AsyncSession = DBSession,
+    current_user: User = Depends(user_session_validate),
+):
+    questions = await db.get_questions_with_incorrect_answers(
+        session, current_user.id_user, category_id=category_id
+    )
+    return map_abcd_questions_seq_to_flashcard(questions)
+
+@flashcard_router.get(
+    "/incorrect/topic/{topic_id}",
+    response_model=FlashcardListResponse,
+)
+async def get_incorrect_flashcards_by_topic(
+    topic_id: int,
+    session: AsyncSession = DBSession,
+    current_user: User = Depends(user_session_validate),
+):
+    questions = await db.get_questions_with_incorrect_answers(
+        session, current_user.id_user, topic_id=topic_id
+    )
+    return map_abcd_questions_seq_to_flashcard(questions)
+
 @flashcard_router.get("/{flashcard_id}", response_model = FlashcardResponse)
 async def get_flashcard(flashcard_id: int, 
                         session: AsyncSession = DBSession):
@@ -35,6 +74,7 @@ async def get_flashcard(flashcard_id: int,
             detail=f"Flashcard {flashcard_id} not found"
         )
     return flashcard
+
 
 
 """

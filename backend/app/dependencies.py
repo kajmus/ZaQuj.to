@@ -57,6 +57,6 @@ async def user_session_validate(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Użytkownik nie istnieje.",
         )
-
+    
     await refresh_user_session(db, session_id)
     return user
